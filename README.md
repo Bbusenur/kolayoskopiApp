@@ -1,3 +1,5 @@
+Link: https://expo.dev/accounts/busssnrrr/projects/kolayoskopi1/builds/e431c58e-9134-4886-9e7d-392342334bcd
+
 # 🏥 Kolay Oskopi - Bağırsak Hazırlığı Eğitimi Mobil Uygulaması
 
 Kolonoskopi öncesi bağırsak temizliği işlemlerinde hastalara yardımcı olmak için geliştirilmiş modern bir mobil uygulama.

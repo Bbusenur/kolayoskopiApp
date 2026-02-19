@@ -21,18 +21,29 @@ export default function HomeScreen({ navigation }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newMedication, setNewMedication] = useState("");
 
+  const [userName, setUserName] = useState("");
+
   useEffect(() => {
     loadData();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      loadData();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const loadData = async () => {
     try {
       setLoading(true);
+
+      // İsim yükle
+      const name = await AsyncStorage.getItem("userName");
+      if (name) setUserName(name);
+
       const date = await AsyncStorage.getItem("procedureDate");
       if (date) {
         setProcedureDate(date);
       }
-      
+
       // İlaçları yükle
       const savedMedications = await AsyncStorage.getItem("medications");
       if (savedMedications) {
@@ -163,9 +174,18 @@ export default function HomeScreen({ navigation }) {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Benim Kolonoskopim</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-            <Text style={styles.headerIcon}>🏠</Text>
+          <View>
+            <Text style={styles.greetingText}>
+              {userName ? `Merhaba, ${userName} 👋` : "Hoş Geldiniz 👋"}
+            </Text>
+            <Text style={styles.headerTitle}>Kolonoskopi Hazırlığı</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+            <View style={styles.profileButton}>
+              <Text style={styles.profileButtonText}>
+                {userName ? userName.charAt(0).toUpperCase() : "👤"}
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
         <EmptyState
@@ -180,9 +200,18 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Benim Kolonoskopim</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Text style={styles.headerIcon}>🏠</Text>
+        <View>
+          <Text style={styles.greetingText}>
+            {userName ? `Merhaba, ${userName} 👋` : "Hoş Geldiniz 👋"}
+          </Text>
+          <Text style={styles.headerTitle}>Hazırlık Süreci</Text>
+        </View>
+        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+          <View style={styles.profileButton}>
+            <Text style={styles.profileButtonText}>
+              {userName ? userName.charAt(0).toUpperCase() : "👤"}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -201,8 +230,8 @@ export default function HomeScreen({ navigation }) {
               {getReminderStatus()?.type === "critical"
                 ? "⚠️"
                 : getReminderStatus()?.type === "important"
-                ? "⏰"
-                : "📌"}
+                  ? "⏰"
+                  : "📌"}
             </Text>
             <Text style={styles.reminderText}>
               {getReminderStatus()?.message}
@@ -374,7 +403,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Yeni İlaç Ekle</Text>
-            
+
             <TextInput
               style={styles.modalInput}
               placeholder="İlaç adını giriniz..."
@@ -394,7 +423,7 @@ export default function HomeScreen({ navigation }) {
               >
                 <Text style={styles.modalButtonCancelText}>İptal</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonSave]}
                 onPress={handleAddMedication}
@@ -433,14 +462,32 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  greetingText: {
+    fontSize: 14,
+    color: "#6C757D",
+    fontWeight: "600",
+    marginBottom: 4,
+  },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: 22,
+    fontWeight: "800",
     color: "#212529",
     letterSpacing: 0.5,
   },
-  headerIcon: {
-    fontSize: 28,
+  profileButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#E9ECEF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#DEE2E6",
+  },
+  profileButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#495057",
   },
   content: {
     flex: 1,

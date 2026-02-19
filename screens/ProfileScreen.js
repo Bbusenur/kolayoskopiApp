@@ -1,12 +1,56 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfileScreen({ navigation }) {
+  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const name = await AsyncStorage.getItem("userName");
+      if (name) setUserName(name);
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!userName.trim()) {
+      Alert.alert("Uyarı", "Lütfen bir isim giriniz.");
+      return;
+    }
+
+    try {
+      await AsyncStorage.setItem("userName", userName.trim());
+      Alert.alert("Başarılı", "Profil bilgileriniz güncellendi.", [
+        { text: "Tamam" }
+      ]);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      Alert.alert("Hata", "Profil kaydedilirken bir hata oluştu.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Profil ✓</Text>
-        <TouchableOpacity style={styles.saveButton}>
+        <Text style={styles.headerText}>Profil</Text>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Kaydet</Text>
         </TouchableOpacity>
       </View>
@@ -18,14 +62,38 @@ export default function ProfileScreen({ navigation }) {
       >
         <View style={styles.iconContainer}>
           <View style={styles.phoneIcon}>
-            <View style={styles.phoneScreen} />
+            <View style={styles.phoneScreen}>
+              <Text style={styles.avatarText}>
+                {userName ? userName.charAt(0).toUpperCase() : "?"}
+              </Text>
+            </View>
           </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Adınız Soyadınız</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="İsminizi giriniz..."
+            value={userName}
+            onChangeText={setUserName}
+            autoCapitalize="words"
+          />
         </View>
 
         <Text style={styles.infoText}>
           Bu uygulama, kolonoskopi öncesi bağırsak temizliği işlemlerinde size
           yardım edecektir.
         </Text>
+
+        <TouchableOpacity
+          style={styles.faqButton}
+          onPress={() => navigation.navigate("FAQ")}
+        >
+          <Text style={styles.faqButtonIcon}>❓</Text>
+          <Text style={styles.faqButtonText}>Sık Sorulan Sorular</Text>
+          <Text style={styles.faqButtonArrow}>→</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -144,6 +212,58 @@ const styles = StyleSheet.create({
   },
   footerIcon: {
     fontSize: 22,
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#495057",
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  input: {
+    backgroundColor: "#F8F9FA",
+    borderWidth: 1,
+    borderColor: "#DEE2E6",
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: "#212529",
+  },
+  avatarText: {
+    fontSize: 48,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    textAlign: "center",
+    lineHeight: 150, // Center vertically in phoneScreen
+  },
+  faqButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E3F2FD",
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#BBDEFB",
+  },
+  faqButtonIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  faqButtonText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1976D2",
+  },
+  faqButtonArrow: {
+    fontSize: 20,
+    color: "#1976D2",
+    fontWeight: "bold",
   },
 });
 

@@ -10,6 +10,7 @@ import QuestionScreen from "./screens/QuestionScreen";
 import QuestionHistoryScreen from "./screens/QuestionHistoryScreen";
 import ProgressScreen from "./screens/ProgressScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import FAQScreen from "./screens/FAQScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,7 @@ export default function App() {
         <Stack.Screen name="QuestionHistory" component={QuestionHistoryScreen} />
         <Stack.Screen name="Progress" component={ProgressScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="FAQ" component={FAQScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
